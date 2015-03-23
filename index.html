@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8 />
+    <title>GeoJSON Test Data Generator</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no'/>
+    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.5/mapbox.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.5/mapbox.css' rel='stylesheet'/>
+    <link href='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.2/leaflet.draw.css' rel='stylesheet' />
+    <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.2/leaflet.draw.js'></script>
+    <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-geodesy/v0.1.0/leaflet-geodesy.js'></script>
+</head>
+
+<body>
+
+<style>
+    html, body {
+    height: 100%;
+    }
+
+    body {
+    font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+    /*  color: #FFF;*/
+    margin: 0;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    }
+
+    #map {
+    position:absolute;
+    top:0;
+    bottom:0;
+    width:100%;
+    z-index:0;
+    }
+</style>
+
+    <div id='map'></div>
+
+<script>
+    
+    // Map setup
+    L.mapbox.accessToken = 'pk.eyJ1IjoiYmVuY28iLCJhIjoibFR5OENaSSJ9.1FJH6zh7FgXL1c0t_eg5NA';
+    var map = L.mapbox.map('map','benco.lhgcp30a').setView([40.769, -97.00], 4);
+
+    // Implement feature drawing
+    var featureGroup = L.featureGroup().addTo(map);
+
+    var drawControl = new L.Control.Draw({
+      edit: {
+        featureGroup: featureGroup
+      },
+      draw: {
+        polygon: true,
+        polyline: false,
+        rectangle: true,
+        circle: false,
+        marker: true
+      }
+    }).addTo(map);
+
+    map.on('draw:created', showPolygonArea);
+    map.on('draw:edited', showPolygonAreaEdited);
+
+    function showPolygonAreaEdited(e) {
+      e.layers.eachLayer(function(layer) {
+        showPolygonArea({ layer: layer });
+      });
+    }
+    function showPolygonArea(e) {
+      // featureGroup.clearLayers();
+      featureGroup.addLayer(e.layer);
+      e.layer.bindPopup((LGeo.area(e.layer) / 1000000).toFixed(2) + ' km<sup>2</sup>');
+      e.layer.openPopup();
+    }
+
+    // 
+
+</script>
+
+</body>
+
+</html>
+
