@@ -33,6 +33,14 @@
     width:100%;
     z-index:0;
     }
+
+    button {
+
+        position:relative;
+        left:10px;
+        margin-top:210px;
+        z-index: 2;
+    }
 </style>
 
     <div id='map'></div>
@@ -51,16 +59,31 @@
         featureGroup: featureGroup
       },
       draw: {
-        polygon: true,
+        polygon:  {
+            allowIntersection: false, // Restricts shapes to simple polygons
+            drawError: {
+                color: '#e1e100', // Color the shape will turn when intersects
+                message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
+            },
+            shapeOptions: {
+                color: '#bada55'
+            }
+        },
         polyline: false,
-        rectangle: true,
+        rectangle: false,
         circle: false,
         marker: true
       }
     }).addTo(map);
 
-    map.on('draw:created', showPolygonArea);
-    map.on('draw:edited', showPolygonAreaEdited);
+    map.on('draw:created', function(e) {
+        showPolygonArea(e);
+
+    });
+
+    map.on('draw:edited', function(e) {
+        showPolygonAreaEdited(e);
+    });
 
     function showPolygonAreaEdited(e) {
       e.layers.eachLayer(function(layer) {
@@ -68,13 +91,51 @@
       });
     }
     function showPolygonArea(e) {
-      // featureGroup.clearLayers();
+      featureGroup.clearLayers();
       featureGroup.addLayer(e.layer);
       e.layer.bindPopup((LGeo.area(e.layer) / 1000000).toFixed(2) + ' km<sup>2</sup>');
       e.layer.openPopup();
+
+      // Defines user polygon upon create/edit
+      getUserPolygon(e);
     }
 
-    // 
+    // Get user input
+
+        // Number of points desired (up to some maximum)
+        var btn = document.createElement("BUTTON");
+        var t = document.createTextNode("Generate");
+        btn.appendChild(t);
+        btn.onclick = function () {
+            N = parseInt(prompt("How many markers would you like?"));
+            title = prompt("Please give your set a title (optional)");
+            alert("Please select your marker boundries with a polygon");
+        };
+        document.body.appendChild(btn);
+
+        // Defines polygon variable
+        function getUserPolygon(e) {
+            polygon = e.layer;
+            console.log(polygon);
+        };
+
+    // Determine max boundries
+
+    // Generate psuedo-random markers
+
+        // Random x, random y
+
+            // Pool
+
+            // Pip: Does point lie within user's polygon?
+
+                // If true, add to pool
+
+                // else, continue
+
+            // Break if pool length >= N
+
+
 
 </script>
 
