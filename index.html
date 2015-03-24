@@ -109,7 +109,7 @@
         btn.onclick = function () {
             N = parseInt(prompt("How many markers would you like?"));
             title = prompt("Please give your set a title (optional)");
-            alert("Please select your marker boundries with a polygon");
+            alert("Please draw your marker boundries with a polygon");
         };
         document.body.appendChild(btn);
 
@@ -117,9 +117,32 @@
         function getUserPolygon(e) {
             polygon = e.layer;
             console.log(polygon);
+            outerBounds();
         };
 
-    // Determine max boundries
+    // Determine max boundries around polygon
+        function outerBounds() {
+
+            var coords = polygon._latlngs;
+            var latList = [], lngList = [];
+
+            for (var i = 0; i < coords.length; i++ ) {
+                latList.push(coords[i]["lat"]);
+                lngList.push(coords[i]["lng"]);
+            };
+
+            latList.sort(function(a,b) {return a-b});
+            lngList.sort(function(a,b) {return a-b});
+
+            minLat = latList.shift();
+            maxLat = latList.pop();
+            minLng = lngList.shift();
+            maxLng = lngList.pop();
+
+            console.log("maxLat: " + maxLat + ", minLat: " + minLat + 
+                        ", maxLng: " + maxLng + ", minLng: " + minLng );
+
+        }
 
     // Generate psuedo-random markers
 
