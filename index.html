@@ -77,6 +77,7 @@
     }).addTo(map);
 
     map.on('draw:created', function(e) {
+        console.log("draw:created");
         showPolygonArea(e);
 
     });
@@ -91,14 +92,17 @@
       });
     }
     function showPolygonArea(e) {
+        console.log("showPolygonArea");
       featureGroup.clearLayers();
       featureGroup.addLayer(e.layer);
-      e.layer.bindPopup((LGeo.area(e.layer) / 1000000).toFixed(2) + ' km<sup>2</sup>');
-      e.layer.openPopup();
+      // e.layer.bindPopup((LGeo.area(e.layer) / 1000000).toFixed(2) + ' km<sup>2</sup>');
+      // e.layer.openPopup();
 
       // Defines user polygon upon create/edit
-      getUserPolygon(e);
-    }
+      getUserPolygon(e),
+      makeMarkers();
+
+    };
 
     // Get user input
 
@@ -116,7 +120,7 @@
         // Defines polygon variable
         function getUserPolygon(e) {
             polygon = e.layer;
-            console.log(polygon);
+            console.log("getUserPolygon");
             outerBounds();
         };
 
@@ -139,24 +143,34 @@
             minLng = lngList.shift();
             maxLng = lngList.pop();
 
-            console.log("maxLat: " + maxLat + ", minLat: " + minLat + 
-                        ", maxLng: " + maxLng + ", minLng: " + minLng );
+            console.log("outerBounds");
 
         }
 
-    // Generate psuedo-random markers
+    // Generate (psuedo-?) random markers
+        function makeMarkers() {
+            console.log("makeMarkers");
+            // Pool of valid markers
+            markerPool = [];
+            while (markerPool.length < N) {
+                
+                // Random x, random y
+                var randLat = randomOverRange(minLat, maxLat);
+                var randLng = randomOverRange(minLng, maxLng);
 
-        // Random x, random y
-
-            // Pool
-
-            // Pip: Does point lie within user's polygon?
-
+                // Pip: Does point lie within user's polygon?
                 // If true, add to pool
-
+                markerPool.push([randLat,randLng]);
                 // else, continue
 
-            // Break if pool length >= N
+            };
+
+            function randomOverRange(lowVal, highVal) {
+                return (lowVal + Math.random() * (highVal - lowVal));
+            };
+        };
+
+
 
 
     // Display marker results
