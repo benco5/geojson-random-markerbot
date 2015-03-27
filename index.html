@@ -10,37 +10,38 @@
     <link href='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.2/leaflet.draw.css' rel='stylesheet' />
     <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.2/leaflet.draw.js'></script>
     <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-geodesy/v0.1.0/leaflet-geodesy.js'></script>
+    <script src='/leaflet-pip.min.js'></script>
 </head>
 
 <body>
 
 <style>
     html, body {
-    height: 100%;
+        height: 100%;
     }
 
     body {
-    font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
-    /*  color: #FFF;*/
-    margin: 0;
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
+        font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+        /*  color: #FFF;*/
+        margin: 0;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
     }
 
     #map {
-    position:absolute;
-    top:0;
-    bottom:0;
-    width:100%;
-    z-index:0;
+        position:absolute;
+        top:0;
+        bottom:0;
+        width:100%;
+        z-index:0;
     }
 
     button {
-
         position:relative;
         left:10px;
         margin-top:210px;
         z-index: 2;
     }
+
 </style>
 
     <div id='map'></div>
@@ -106,69 +107,109 @@
 
     // Get user input
 
-        // Number of points desired (up to some maximum)
-        var btn = document.createElement("BUTTON");
-        var t = document.createTextNode("Generate");
-        btn.appendChild(t);
-        btn.onclick = function () {
-            N = parseInt(prompt("How many markers would you like?"));
-            title = prompt("Please give your set a title (optional)");
-            alert("Please draw your marker boundries with a polygon");
-        };
-        document.body.appendChild(btn);
+    // Number of points desired (up to some maximum)
+    var btn = document.createElement("BUTTON");
+    var t = document.createTextNode("Generate");
+    btn.appendChild(t);
+    btn.onclick = function () {
+        N = parseInt(prompt("How many markers would you like?"));
+        title = prompt("Please give your set a title (optional)");
+        alert("Please draw your marker boundries with a polygon");
+    };
+    document.body.appendChild(btn);
 
-        // Defines polygon variable
-        function getUserPolygon(e) {
-            polygon = e.layer;
-            console.log("getUserPolygon");
-            outerBounds();
-        };
+    // Defines polygon variable
+    function getUserPolygon(e) {
+        polygon = e.layer;
+        console.log("getUserPolygon");
+        outerBounds();
+    };
 
     // Determine max boundaries around polygon
-        function outerBounds() {
+    function outerBounds() {
 
-            var coords = polygon._latlngs;
-            var latList = [], lngList = [];
+        var coords = polygon._latlngs;
+        var latList = [], lngList = [];
 
-            for (var i = 0; i < coords.length; i++ ) {
-                latList.push(coords[i]["lat"]);
-                lngList.push(coords[i]["lng"]);
-            };
+        for (var i = 0; i < coords.length; i++ ) {
+            latList.push(coords[i]["lat"]);
+            lngList.push(coords[i]["lng"]);
+        };
 
-            latList.sort(function(a,b) {return a-b});
-            lngList.sort(function(a,b) {return a-b});
+        latList.sort(function(a,b) {return a-b});
+        lngList.sort(function(a,b) {return a-b});
 
-            minLat = latList.shift();
-            maxLat = latList.pop();
-            minLng = lngList.shift();
-            maxLng = lngList.pop();
+        minLat = latList.shift();
+        maxLat = latList.pop();
+        minLng = lngList.shift();
+        maxLng = lngList.pop();
 
-            console.log("outerBounds");
-
-        }
+        console.log("outerBounds");
+    }
 
     // Generate (psuedo-?) random markers
-        function makeMarkers() {
-            console.log("makeMarkers");
-            // Pool of valid markers
-            markerPool = [];
-            while (markerPool.length < N) {
-                
-                // Random x, random y
-                var randLat = randomOverRange(minLat, maxLat);
-                var randLng = randomOverRange(minLng, maxLng);
+    function makeMarkers() {
+        console.log("makeMarkers");
 
-                // Pip: Does point lie within user's polygon?
-                // If true, add to pool
-                markerPool.push([randLat,randLng]);
-                // else, continue
+        // Annoying setting that reverses lng/lat back to lat/lng (its a Scottish thing?)
+        leafletPip.bassackwards = true;
 
-            };
+        // Create layer from original polygon 
+        var polygonLayer = L.geoJson(makeFeature(convertCoords(polygon._latlngs), "Polygon"));
 
-            function randomOverRange(lowVal, highVal) {
-                return (lowVal + Math.random() * (highVal - lowVal));
+        // Pool of valid markers
+        markerPool = makeCollection();
+
+        while (markerPool["features"].length < N) {
+            
+            // Random x, random y
+            var randLat = randomOverRange(minLat, maxLat);
+            var randLng = randomOverRange(minLng, maxLng);
+
+            // Check whether point lies within user's polygon. True if array with
+            // layer is returned. Add point to pool, otherwise try a new point.
+            var testCoords = leafletPip.pointInLayer([randLat, randLng], polygonLayer);
+
+            if (testCoords.length > 0) {
+                var newPoint = makeFeature([randLat, randLng], "Point");
+                markerPool["features"].push(newPoint);
+            } else {
+                continue;
             };
         };
+    };
+
+    function randomOverRange(lowVal, highVal) {
+        return (lowVal + Math.random() * (highVal - lowVal));
+    };
+
+    function makeCollection() {
+        var newCollection = { "type": "FeatureCollection", "features": [] };
+        return newCollection;
+    }
+
+    function makeFeature(coordsArr, typeStr) {
+        console.log("Make feature: " + typeStr);
+        var newFeature =   {
+                                "type": "Feature",
+                                "properties": {},
+                                "geometry": {
+                                "type": typeStr,
+                                "coordinates": coordsArr
+                            }
+                        };
+        return newFeature;
+    };
+
+    function convertCoords(objCoords) {
+        var arrCoords = [[]];
+        for (var i=0; i < objCoords.length; i++) {
+            // Note reversed order of lat/lng. Note sure why, but this is
+            // necessary for L.geoJson layer coords to come out correctly 
+            arrCoords[0].push([objCoords[i]["lng"],objCoords[i]["lat"]]);
+        };
+        return arrCoords;
+    };
 
 
 
