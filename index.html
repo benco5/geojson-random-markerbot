@@ -54,6 +54,7 @@
 
     // Implement feature drawing
     var featureGroup = L.featureGroup().addTo(map);
+    var featureLayer = L.mapbox.featureLayer().addTo(map);
 
     var drawControl = new L.Control.Draw({
       edit: {
@@ -102,7 +103,6 @@
       // Defines user polygon upon create/edit
       getUserPolygon(e),
       makeMarkers();
-
     };
 
     // Get user input
@@ -171,12 +171,18 @@
             var testCoords = leafletPip.pointInLayer([randLat, randLng], polygonLayer);
 
             if (testCoords.length > 0) {
-                var newPoint = makeFeature([randLat, randLng], "Point");
+                var newPoint = makeFeature([randLng, randLat], "Point");
                 markerPool["features"].push(newPoint);
             } else {
                 continue;
             };
+
         };
+
+        featureLayer.setGeoJSON(markerPool);
+        if (markerPool["features"].length > 0) {
+            console.log("markers exist");
+        }
     };
 
     function randomOverRange(lowVal, highVal) {
@@ -212,11 +218,7 @@
     };
 
 
-
-
     // Display marker results
-
-        // Map
 
         // Text for copy-paste (file?);
 
