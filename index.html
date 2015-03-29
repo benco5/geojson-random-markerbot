@@ -10,7 +10,9 @@
     <link href='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.2/leaflet.draw.css' rel='stylesheet' />
     <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.2/leaflet.draw.js'></script>
     <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-geodesy/v0.1.0/leaflet-geodesy.js'></script>
-    <script src='/leaflet-pip.min.js'></script>
+    <script src='/lib/leaflet-pip.min.js'></script>
+    <link rel='stylesheet' href='lib/codemirror/lib/codemirror.css'>
+    <script src='lib/codemirror/lib/codemirror.js'></script>
 </head>
 
 <body>
@@ -31,7 +33,7 @@
         position:absolute;
         top:0;
         bottom:0;
-        width:100%;
+        width:75%;
         z-index:0;
     }
 
@@ -39,9 +41,9 @@
         position:absolute;
         top:0;
         right:0;
-        width:30%;
+        width:25%;
         height:100%;
-        padding:2em;
+        /*padding:2em;*/
         color:black;
         background: #fff;
         z-index: 1;
@@ -184,10 +186,7 @@
             };
         };
         featureLayer.setGeoJSON(markerPool);
-        // var textHere = document.getElementsByTagName('textarea');
-        // var geojsonText = JSON.parse(markerPool);
-        // var features = new GeoJSON(geoJsont);
-        // textHere.innerHTML = features;
+        displayGeoJSON();
     };
 
     function randomOverRange(lowVal, highVal) {
@@ -222,14 +221,24 @@
         return arrCoords;
     };
 
+    var mySidebar = document.getElementById('sidebar');
+    var myCodeMirror = CodeMirror(mySidebar, {
+        lineNumbers: true,
+        value: " Click 'Generate' to get started\n",
+        mode:  "javascript",
+        readOnly: true
+    });
 
     // Display marker results
+    function displayGeoJSON () {
+        alert("displayGeoJSON");
 
-        // Text for copy-paste (file?);
+        // var geojsonText = JSON.parse(markerPool);
+        // var features = new GeoJSON(geojsonText);
+        // myTextArea.innerHTML = markerPool["features"];
+
+    };
 
 </script>
-
 </body>
-
 </html>
-
