@@ -57,9 +57,7 @@
 </style>
 
     <div id='map'></div>
-    <div id='sidebar'>
-        <textarea></textarea>
-    </div>
+    <div id='sidebar'></div>
 
 <script>
     
@@ -89,7 +87,7 @@
         polyline: false,
         rectangle: false,
         circle: false,
-        marker: true
+        marker: false
       }
     }).addTo(map);
 
@@ -121,7 +119,7 @@
       makeMarkers();
     };
 
-    // Number of points desired (up to some maximum)
+    // Number of points desired (up to some maximum?)
     var btn = document.createElement("BUTTON");
     var t = document.createTextNode("Generate");
     btn.appendChild(t);
