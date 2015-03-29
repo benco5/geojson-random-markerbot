@@ -35,6 +35,18 @@
         z-index:0;
     }
 
+    #sidebar {
+        position:absolute;
+        top:0;
+        right:0;
+        width:30%;
+        height:100%;
+        padding:2em;
+        color:black;
+        background: #fff;
+        z-index: 1;
+    }
+
     button {
         position:relative;
         left:10px;
@@ -45,6 +57,9 @@
 </style>
 
     <div id='map'></div>
+    <div id='sidebar'>
+        <textarea></textarea>
+    </div>
 
 <script>
     
@@ -92,7 +107,8 @@
       e.layers.eachLayer(function(layer) {
         showPolygonArea({ layer: layer });
       });
-    }
+    };
+
     function showPolygonArea(e) {
         console.log("showPolygonArea");
       featureGroup.clearLayers();
@@ -105,8 +121,6 @@
       makeMarkers();
     };
 
-    // Get user input
-
     // Number of points desired (up to some maximum)
     var btn = document.createElement("BUTTON");
     var t = document.createTextNode("Generate");
@@ -116,6 +130,7 @@
         title = prompt("Please give your set a title (optional)");
         alert("Please draw your marker boundries with a polygon");
     };
+
     document.body.appendChild(btn);
 
     // Defines polygon variable
@@ -125,20 +140,16 @@
         outerBounds();
     };
 
-    // Determine max boundaries around polygon
+    // Determine max boundaries around polygon ('bounding box')
     function outerBounds() {
-
         var coords = polygon._latlngs;
         var latList = [], lngList = [];
-
         for (var i = 0; i < coords.length; i++ ) {
             latList.push(coords[i]["lat"]);
             lngList.push(coords[i]["lng"]);
         };
-
         latList.sort(function(a,b) {return a-b});
         lngList.sort(function(a,b) {return a-b});
-
         minLat = latList.shift();
         maxLat = latList.pop();
         minLng = lngList.shift();
@@ -153,13 +164,10 @@
 
         // Annoying setting that reverses lng/lat back to lat/lng (its a Scottish thing?)
         leafletPip.bassackwards = true;
-
         // Create layer from original polygon 
         var polygonLayer = L.geoJson(makeFeature(convertCoords(polygon._latlngs), "Polygon"));
-
         // Pool of valid markers
         markerPool = makeCollection();
-
         while (markerPool["features"].length < N) {
             
             // Random x, random y
@@ -176,13 +184,12 @@
             } else {
                 continue;
             };
-
         };
-
         featureLayer.setGeoJSON(markerPool);
-        if (markerPool["features"].length > 0) {
-            console.log("markers exist");
-        }
+        // var textHere = document.getElementsByTagName('textarea');
+        // var geojsonText = JSON.parse(markerPool);
+        // var features = new GeoJSON(geoJsont);
+        // textHere.innerHTML = features;
     };
 
     function randomOverRange(lowVal, highVal) {
