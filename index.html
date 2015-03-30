@@ -13,6 +13,7 @@
     <script src='/lib/leaflet-pip.min.js'></script>
     <link rel='stylesheet' href='lib/codemirror/lib/codemirror.css'>
     <script src='lib/codemirror/lib/codemirror.js'></script>
+    <script src='lib/codemirror/mode/javascript/javascript.js'></script>
 </head>
 
 <body>
@@ -33,7 +34,7 @@
         position:absolute;
         top:0;
         bottom:0;
-        width:75%;
+        width:70%;
         z-index:0;
     }
 
@@ -41,7 +42,7 @@
         position:absolute;
         top:0;
         right:0;
-        width:25%;
+        width:30%;
         height:100%;
         /*padding:2em;*/
         color:black;
@@ -225,13 +226,13 @@
     var myCodeMirror = CodeMirror(mySidebar, {
         lineNumbers: true,
         value: " Click 'Generate' to get started\n",
-        mode:  "javascript",
+        mode: { name: "javascript", json: true },
         readOnly: true
     });
 
     // Display marker results
     function displayGeoJSON () {
-        alert("displayGeoJSON");
+        myCodeMirror.setValue(JSON.stringify(markerPool, null, '\t'));
 
         // var geojsonText = JSON.parse(markerPool);
         // var features = new GeoJSON(geojsonText);
