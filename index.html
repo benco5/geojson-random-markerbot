@@ -131,8 +131,16 @@
         title = prompt("Please give your set a title (optional)");
         alert("Please draw your marker boundries with a polygon");
     };
-
     document.body.appendChild(btn);
+
+    // Setup sidebar and codemirror text editor (read-only)
+    var sidebar = document.getElementById('sidebar');
+    var myCodeMirror = CodeMirror(sidebar, {
+        lineNumbers: true,
+        value: " Click 'Generate' to get started\n",
+        mode: { name: "javascript", json: true },
+        readOnly: true
+    });
 
     // Defines polygon variable
     function getUserPolygon(e) {
@@ -163,8 +171,6 @@
     function makeMarkers() {
         console.log("makeMarkers");
 
-        // Annoying setting that reverses lng/lat back to lat/lng (its a Scottish thing?)
-        leafletPip.bassackwards = true;
         // Create layer from original polygon 
         var polygonLayer = L.geoJson(makeFeature(convertCoords(polygon._latlngs), "Polygon"));
         // Pool of valid markers
@@ -172,12 +178,12 @@
         while (markerPool["features"].length < N) {
             
             // Random x, random y
-            var randLat = randomOverRange(minLat, maxLat);
             var randLng = randomOverRange(minLng, maxLng);
+            var randLat = randomOverRange(minLat, maxLat);
 
             // Check whether point lies within user's polygon. True if array with
             // layer is returned. Add point to pool, otherwise try a new point.
-            var testCoords = leafletPip.pointInLayer([randLat, randLng], polygonLayer);
+            var testCoords = leafletPip.pointInLayer([randLng, randLat], polygonLayer);
 
             if (testCoords.length > 0) {
                 var newPoint = makeFeature([randLng, randLat], "Point");
@@ -215,29 +221,14 @@
     function convertCoords(objCoords) {
         var arrCoords = [[]];
         for (var i=0; i < objCoords.length; i++) {
-            // Note reversed order of lat/lng. Note sure why, but this is
-            // necessary for L.geoJson layer coords to come out correctly 
             arrCoords[0].push([objCoords[i]["lng"],objCoords[i]["lat"]]);
         };
         return arrCoords;
     };
 
-    var mySidebar = document.getElementById('sidebar');
-    var myCodeMirror = CodeMirror(mySidebar, {
-        lineNumbers: true,
-        value: " Click 'Generate' to get started\n",
-        mode: { name: "javascript", json: true },
-        readOnly: true
-    });
-
     // Display marker results
     function displayGeoJSON () {
         myCodeMirror.setValue(JSON.stringify(markerPool, null, '\t'));
-
-        // var geojsonText = JSON.parse(markerPool);
-        // var features = new GeoJSON(geojsonText);
-        // myTextArea.innerHTML = markerPool["features"];
-
     };
 
 </script>
