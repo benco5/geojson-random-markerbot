@@ -1,6 +1,7 @@
 # geojson-random-markerbot
-Soon to-be* really basic means of getting a bunch of GeoJSON points in a particular area for templating, testing and other quick and dirty purposes
+Easy way to generate N x GeoJSON points in a user drawn polygon for templating, testing and other quick and dirty purposes
 
+https://geojson-random-markerbot.herokuapp.com/
 
 For now:
 1) Click "generate" button
@@ -10,10 +11,3 @@ For now:
 5) Magic happens
 6) Random points plotted within user drawn polygon
 
-To do:
--Styling and improve UI (get rid of prompts)
-*-Means for copying or otherwise obtaining points
--Marker options (title, id, size, color, combine batches/collections from different polygons)
--Alternate means of submitting polygon
--Refactor (in general)
--Consider randomizing options/alternatives to Math.random()
